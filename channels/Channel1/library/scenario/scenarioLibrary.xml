@@ -1,8 +1,0 @@
-<ScenarioLibrary>
-  <ScenarioDefinition name='_ISDBG' lastModified='1443622722075'>
-     <ConditionDefinition observer='SignonStateObserver' operator='EQ' observerProperty='signedonstate.details.iscltdbg' target='true' />
-  </ScenarioDefinition>
-  <ScenarioDefinition name='_ISSCRATCHCARD' lastModified='1443701990564'>
-     <ConditionDefinition observer='SignonStateObserver' operator='EQ' observerProperty='signedonstate.details.iscltdbg' target='false' />
-  </ScenarioDefinition>
-</ScenarioLibrary>

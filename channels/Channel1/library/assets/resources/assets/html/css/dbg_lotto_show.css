@@ -1,0 +1,116 @@
+@charset "utf-8";
+
+html {-webkit-user-select:none;}
+html,body {overflow:hidden;}
+.ui-loader {display:none;}
+
+* {
+	outline:none; 
+	-webkit-user-select:none;
+	-webkit-tap-highlight-color:rgba(255, 255, 255, 0);
+	-webkit-tap-highlight-color:transparent; /*/ For some Androids /*/
+}
+
+html,body { 
+	margin:0; 
+	padding:0;
+	background-color:#000000;
+	overflow:hidden;
+} 
+
+body {
+	width:800px;
+	height:480px;
+	overflow:hidden;
+	cursor:default;
+	color:#000000;
+	background-color:#FFFFFF;
+	/*//*/
+	background-image:url(../images/generic/background.png);
+	background-repeat:no-repeat;
+	display:none;
+}
+
+/*////////*/
+/*/ TEXT /*/
+/*////////*/
+
+@font-face {
+	font-family:'EffraHeavy';
+	src:url('../fonts/tnl_effra_he.eot');
+	src:url('../fonts/tnl_effra_he.eot?#iefix') format('embedded-opentype'),
+	     url('../fonts/tnl_effra_he.woff') format('application/x-font-woff'),
+	     url('../fonts/tnl_effra_he.ttf') format('truetype'),
+	     url('../fonts/tnl_effra_he.svg#svgFontName') format('svg');
+}
+@font-face {
+	font-family:'EffraRegular';
+	src:url('../fonts/tnl_effra_rg.eot');
+	src:url('../fonts/tnl_effra_rg.eot?#iefix') format('embedded-opentype'),
+	     url('../fonts/tnl_effra_rg.woff') format('application/x-font-woff'),
+	     url('../fonts/tnl_effra_rg.ttf') format('truetype'),
+	     url('../fonts/tnl_effra_rg.svg#svgFontName') format('svg');
+}
+
+h1, h2 {font-family:EffraHeavy;}
+p, h3 {font-family:EffraRegular;}
+
+h1 {font-size:42px;}
+h2 {font-size:20px;}
+h3 {font-size:16px;}
+p {font-size:16px;line-height:25px;}
+
+.btn-generic {font-size:16px;}
+
+h1, h2, h3, p {margin:0}
+
+.small {font-size:12px;}
+.highlight {color:#61257F;}
+
+/*///////////////////*/
+/*/ SCREEN ELEMENTS /*/
+/*///////////////////*/
+
+.screen{
+	width:800px;
+	height:480px;
+	display:block;
+	clear:both;
+	position:relative;
+	/*//*/
+	/*/unselectable/*/
+   -moz-user-select:-moz-none;
+   -khtml-user-select:none;
+   -webkit-user-select:none;
+   -ms-user-select:none;
+	user-select:none;
+}
+
+/*/////////////////*/
+/*/ CORE ELEMENTS /*/
+/*/////////////////*/
+
+.header{
+	width:800px;
+	height:95px;
+	display:block;
+	float:left;
+	padding-bottom:5px;
+}
+
+.generic-content{
+	width:800px;
+	height:380px;
+	display:block;
+	float:left;
+	margin:0;
+}
+
+.generic-content-inner{
+	width:700px;
+	height:280px;
+	display:block;
+	float:left;
+	padding:100px 50px 0 50px;
+	text-align:center;
+}

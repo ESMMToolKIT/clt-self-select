@@ -1,0 +1,4 @@
+<EventLibrary>
+  <Event eventName='_SCAN' observer='BarcodeObserver' observerProperty='barcode.data.value' lastModified='1443621924767' />
+  <Event eventName='_MASTEROST' observer='' observerProperty='' lastModified='1444303095170' />
+</EventLibrary>

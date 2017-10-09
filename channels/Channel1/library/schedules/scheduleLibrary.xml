@@ -1,0 +1,51 @@
+<ScheduleLibrary>
+  <Schedule name='_NOTDRAWBREAK1' lastModified='undefined'>
+     <TimeSlot startHour='05' startMinute='00' endHour='19' endMinute='30'/>
+     <Recurrence implClass='com.gtech.esmultimedia.cdf.schedule.DayOfWeekRecurrence' mapping='0011011' />
+  </Schedule>
+  <Schedule name='_NOTDRAWBREAK2' lastModified='undefined'>
+     <TimeSlot startHour='05' startMinute='00' endHour='23' endMinute='00'/>
+     <Recurrence implClass='com.gtech.esmultimedia.cdf.schedule.DayOfWeekRecurrence' mapping='1100100' />
+  </Schedule>
+  <Schedule name='_NOTDRAWBREAKLOTTO1' lastModified='undefined'>
+     <TimeSlot startHour='05' startMinute='00' endHour='19' endMinute='30'/>
+     <Recurrence implClass='com.gtech.esmultimedia.cdf.schedule.DayOfWeekRecurrence' mapping='0001001' />
+  </Schedule>
+  <Schedule name='_NOTDRAWBREAKLOTTO2' lastModified='undefined'>
+     <TimeSlot startHour='05' startMinute='00' endHour='23' endMinute='00'/>
+     <Recurrence implClass='com.gtech.esmultimedia.cdf.schedule.DayOfWeekRecurrence' mapping='1110110' />
+  </Schedule>
+  <Schedule name='_NOTDRAWBREAKEM1' lastModified='undefined'>
+     <TimeSlot startHour='05' startMinute='00' endHour='19' endMinute='30'/>
+     <Recurrence implClass='com.gtech.esmultimedia.cdf.schedule.DayOfWeekRecurrence' mapping='0010010' />
+  </Schedule>
+  <Schedule name='_NOTDRAWBREAKEM2' lastModified='undefined'>
+     <TimeSlot startHour='05' startMinute='00' endHour='23' endMinute='00'/>
+     <Recurrence implClass='com.gtech.esmultimedia.cdf.schedule.DayOfWeekRecurrence' mapping='1101101' />
+  </Schedule>
+  <Schedule name='_ALLDAYSBETWEEN5AM11PM' lastModified='undefined'>
+     <TimeSlot startHour='05' startMinute='00' endHour='23' endMinute='00'/>
+     <Recurrence implClass='com.gtech.esmultimedia.cdf.schedule.DayOfWeekRecurrence' mapping='1111111' />
+  </Schedule>
+  <Schedule name='_GSQ4EXPIRY' lastModified='undefined'>
+     <DateRange startHour='01' startMinute='00' startMonth='12' startDay='31' startYear='2015' endHour='23' endMinute='00' endMonth='02' endDay='20' endYear='2016' />
+     <Recurrence implClass='undefined' mapping='undefined' />
+  </Schedule>
+  <Schedule name='_MFGENEXPIRYJAN' lastModified='undefined'>
+     <DateRange startHour='01' startMinute='00' startMonth='12' startDay='04' startYear='2015' endHour='23' endMinute='00' endMonth='01' endDay='24' endYear='2016' />
+     <Recurrence implClass='undefined' mapping='undefined' />
+  </Schedule>
+  <Schedule name='MFJAN16' lastModified='undefined'>
+     <DateRange startHour='01' startMinute='00' startMonth='11' startDay='01' startYear='2015' endHour='19' endMinute='30' endMonth='01' endDay='29' endYear='2016' />
+     <Recurrence implClass='undefined' mapping='undefined' />
+  </Schedule>
+  <Schedule name='MFFEB16' lastModified='undefined'>
+     <DateRange startHour='01' startMinute='00' startMonth='12' startDay='01' startYear='2015' endHour='19' endMinute='30' endMonth='02' endDay='26' endYear='2016' />
+  </Schedule>
+  <Schedule name='Peoples Project Feb' lastModified='undefined'>
+     <DateRange startHour='01' startMinute='00' startMonth='11' startDay='04' startYear='2015' endHour='23' endMinute='00' endMonth='02' endDay='28' endYear='2016' />
+  </Schedule>
+  <Schedule name='Peoples Project March' lastModified='undefined'>
+     <DateRange startHour='01' startMinute='00' startMonth='02' startDay='29' startYear='2016' endHour='23' endMinute='00' endMonth='03' endDay='14' endYear='2016' />
+  </Schedule>
+</ScheduleLibrary>

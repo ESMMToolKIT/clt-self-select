@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="en">
+	
+	<head>
+		
+		<title>The National Lottery</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta content="width=800; height:480; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
+		<link rel="stylesheet" type="text/css" href="css/generic.css">
+		<link rel="stylesheet" type="text/css" href="css/touch.css">
+		<script type="text/javascript" src="libs/jquery.min.js"></script>
+        <script type="text/javascript" src="libs/jquery.mobile-1.3.2.min.js"></script>
+		<script type="text/javascript" src="libs/jquery-ui.js"></script>
+        
+		<script>
+		
+			var ua = navigator.userAgent.toLowerCase();
+			var isLive = ua.indexOf("android") > -1;
+			
+			/////////////////
+			/*/ VARIABLES /*/
+			/////////////////
+			
+			var signedOn = '';
+			var cltIsDBG = '';
+			
+			// TIMEOUT
+			var timer = '';
+			var timeout = 30000;
+			
+			//TOUCH
+			var repeatTapTimeout = false;
+			var delayAmt = 100;
+			
+			var currentScreen = 'HOME';
+			
+			////////////			
+			/*/ INIT /*/
+			////////////
+			
+			function init(){
+				console.log("init();");
+				
+				hideAllScreens();
+				$("body").show();
+				$(".content-overlay").show();
+				
+				$('.screen').css('position','absolute');
+				$('.overlay').css('position','absolute');
+				
+				preload([
+					'images/touch/touch-home-dbg-btn-over.png',
+					'images/touch/touch-home-scratchcard-btn-over.png'
+				]);
+				
+				touchEventsInit();
+				requestSignedOnState();
+				ESMM.setShowInterruptable('true');
+			}
+			
+			function preload(arrayOfImages) {
+				$(arrayOfImages).each(function(){
+					//$('<img/>')[0].src = this;
+					// Alternatively you could use:
+					 (new Image()).src = this;
+				});
+			}
+			
+			////////////////////
+			/*/ TOUCH EVENTS /*/
+			////////////////////
+		
+			function touchEventsInit(){
+				console.log("touchEventsInit();");
+				
+				// touchTimeout
+				$('body').on("vmousedown",function(event){
+					event.stopPropagation();
+					event.preventDefault();
+					//
+					startTimeout();
+				});
+				
+				$('.exit-btn').on("vmousedown",function(event){
+					event.stopPropagation();
+					event.preventDefault();
+					//
+					if(!repeatTapTimeout){
+						repeatTapTimeout = true;
+						var $this = $(this);
+						$this.addClass("buttonActive");
+						window.setTimeout(function(){$this.removeClass("buttonActive");repeatTapTimeout = false;}, delayAmt);
+						//
+						if (currentScreen == 'HOME'){
+							ESMM.showFinished();
+						}
+						else {
+							changeScreen("HOME");
+						}
+					}
+				});
+		
+				$('.touch-dbg-home-ticket-btn').on("vmousedown",function(event){
+					event.stopPropagation();
+					event.preventDefault();
+					//
+					if(!repeatTapTimeout){
+						repeatTapTimeout = true;
+						var $this = $(this);
+						$this.addClass("buttonActive");
+						window.setTimeout(function(){$this.removeClass("buttonActive");repeatTapTimeout = false;}, delayAmt);
+						//
+						changeScreen("DBG-SCREEN1");
+					}
+				});
+		
+				$('.touch-dbg-home-scratchcard-btn').on("vmousedown",function(event){
+					event.stopPropagation();
+					event.preventDefault();
+					//
+					if(!repeatTapTimeout){
+						repeatTapTimeout = true;
+						var $this = $(this);
+						$this.addClass("buttonActive");
+						window.setTimeout(function(){$this.removeClass("buttonActive");repeatTapTimeout = false;}, delayAmt);
+						//
+						changeScreen("SC-SCREEN1");
+					}
+				});
+			}
+			
+			////////////////			
+			/*/ RESPONSE /*/
+			////////////////
+			
+			function responseFromObserver(id,text){
+				//console.log("responseFromObserver()");
+				
+				var parser = new DOMParser();
+				var doc = parser.parseFromString(text,'text/xml');
+				var $doc = $(doc);
+				
+				if(id == "signOnState"){ 
+					if(isLive){
+						if($doc.find('details').length > 0) {
+							var xmldata = $doc.find('details');
+								
+							// NEW
+							if(xmldata.attr('signedon') != "" && xmldata.attr('signedon') != null && xmldata.attr('signedon') != undefined){signedOn = xmldata.attr('signedon');} 
+							else {signedOn = xmldata.attr('signedOn');}
+								
+							cltIsDBG = xmldata.attr('iscltdbg');
+						} else {
+							console.log("XML Load Error - SignedOnStateData");
+							changeScreen("ERROR");
+						}
+					} else {
+						signedOn = 'true'; 
+						cltIsDBG = 'true';
+					}
+					signedOnStateXMLLoaded();
+				}
+			  
+			};
+			
+			/////////////////			
+			/*/ FUNCTIONS /*/
+			/////////////////
+			
+			function requestSignedOnState(){
+				if(isLive){
+					ESMM.requestFromObserver('signOnState', '/data/signonstateobserver/signon.xml');
+				} else {
+					responseFromObserver("signOnState","debug");
+				}
+			}
+			
+			function signedOnStateXMLLoaded(){
+				if (signedOn != '' && cltIsDBG != '' && signedOn != null && cltIsDBG != null){
+					console.log("signedOnStateXMLLoaded :: " + signedOn +" :: "+ cltIsDBG);
+					changeScreen('HOME');
+				} else {
+					console.log("signedOnStateXMLLoaded() - Data Error");
+					changeScreen("ERROR");
+				}
+			};
+			
+			///////////////
+			/*/ TIMEOUT /*/	
+			///////////////
+			
+			function startTimeout() {
+				console.log("startTimeout();" + this.timeout);
+				clearTimeout(this.timer);
+				var _this = this;
+				this.timer = setTimeout(function(){_this.exitApp();}, this.timeout);
+			};
+			
+			function stopTimeout() {
+				console.log("stopTimeout()");
+				clearTimeout(this.timer);
+			};
+			
+			function exitApp() {
+				console.log("exitApp(); console timed out");
+				ESMM.showFinished();
+			};
+			
+			//////////////
+			/*/ SCREEN /*/
+			//////////////
+			
+			function changeScreen(scrn){
+				
+				switch(scrn){
+					
+					case "HOME":
+						currentScreen = 'HOME';
+						if (cltIsDBG == 'true'){
+							console.log("cltIsDBG (DBG)",cltIsDBG);
+							changeScreen("DBG-HOME");
+						} else {
+							console.log("cltIsDBG (SC)",cltIsDBG);
+							changeScreen("SC-HOME");
+						}
+						break;
+						
+					case "SC-HOME":
+						startTimeout();
+						hideAllScreens();
+						$("#sc-home-screen").fadeIn('slow');
+						break;
+						
+					case "SC-SCREEN1":
+						currentScreen = 'SCREEN1';
+						startTimeout();
+						if(cltIsDBG == 'true'){
+							$("#dbg-home-screen").fadeOut('slow','swing',function(){
+								$("#sc-screen1").fadeIn('slow');
+							});
+						} else {
+							$("#sc-home-screen").fadeOut('slow','swing',function(){
+								$("#sc-screen1").fadeIn('slow');
+							});
+						}
+						break
+					
+					case "DBG-HOME":
+						startTimeout();
+						hideAllScreens();
+						$("#dbg-home-screen").fadeIn('slow');
+						break
+						
+					case "DBG-SCREEN1":
+						currentScreen = 'SCREEN1';
+						startTimeout();
+						$("#dbg-home-screen").fadeOut('slow','swing',function(){
+							$("#dbg-screen1").fadeIn('slow');
+						});
+						break
+						
+					case "ERROR":
+						startTimeout();
+						hideAllScreens();
+						$(".content-overlay").hide();
+						//$("#error-screen").fadeIn('slow');
+						$("#error-screen").show();
+						break
+				}
+			}		
+			
+			function hideAllScreens(){
+				console.log("hideAllScreens()");
+				$(".screen").hide();
+				//$("#sc-home-screen").hide();
+				//$("#dbg-home-screen").hide();
+				//$("#error-screen").hide();
+			}
+			
+			////////////////////////
+			/*/ PHYSICAL BUTTONS /*/
+			////////////////////////
+					
+			function onF4Pressed(){
+				console.log("F4 Pressed");
+				ESMM.shutdownPlayer();
+			}
+			
+			///////////////
+			/*/ ANIMATE 
+			///////////////
+			
+			function animateResults(){
+				$(".result-animation1").hide();
+				$(".result-animation2").hide();
+				$(".result-animation-content h1").hide();
+				$(".result-animation-content h2").hide();
+				$(".result-animation1").delay(000).fadeIn(1500);
+				$(".result-animation2").delay(500).fadeIn(1000);
+				$(".result-animation-content h1").delay(1000).fadeIn(750);
+				$(".result-animation-content h2").delay(1250).fadeIn(750);
+			}/*/
+			
+			///////////
+			/*/ END /*/
+			///////////
+				
+		</script>
+		
+	</head>
+	
+	<body onLoad="init()">
+        
+    	<!------------->
+        <!-- DEFAULT -->
+        <!------------->
+    	
+        <div class="exit-btn"></div>
+        
+    	<div id="" class="content-overlay">
+			<div class="header"></div>
+			<div class="generic-content"></div>
+			<div class="footer"></div>
+        </div>
+        
+        <div id='' class="screen">
+        </div>
+        
+        <!---------------->
+        <!--- SCREENS ---->
+        <!---------------->
+        
+        <div id="sc-home-screen" class="screen">
+		  <div class="generic-content-no-header">
+				<div class="content">
+                	<h1>CHECK IF <br>
+                    YOU'VE WON <br>
+                    HERE</h1>
+                </div>
+              <div id="touch-dbg-home-button-row">
+                  <div class="touch-dbg-home-scratchcard-btn"></div>
+			</div>
+            </div>
+		</div>
+        
+        <div id="dbg-home-screen" class="screen">
+			<div class="generic-content-no-header">
+				<div class="content">
+					<h1>CHECK IF <br>
+                    YOU'VE WON <br>
+                    HERE</h1>
+                </div>
+                <div id="touch-dbg-home-button-row">
+                  <div class="touch-dbg-home-ticket-btn"></div>
+                  <div class="touch-dbg-home-scratchcard-btn"></div>
+                </div>
+		  </div>
+        </div>
+
+        <div id="dbg-screen1" class="screen">
+			<div class="generic-content-no-header">
+                <h2>SCAN YOUR<br>
+                BARCODE</h2>
+                <p>It's on the front of your ticket. <br>
+                Hold it under the scanner.</p>
+          </div>
+        </div>
+
+        <div id="sc-screen1" class="screen">
+			<div class="generic-content-no-header">
+                <h2>SCAN THE LONG<br>
+                BARCODE</h2>
+                <p>It's on the back of your Scratchcard.<br>
+                Hold it under the scanner.</p>
+          </div>
+        </div>
+        
+		<div id="error-screen" class="screen">
+			<div class="full-screen">
+                <h1>ALL NATIONAL <br>LOTTERY GAMES <br>ARE NOW <br>AVAILABLE IN <br>THIS STORE</h1>
+			</div>
+        </div>
+        
+        <span id="#preload-01"></span>
+        <span id="#preload-02"></span>
+        
+        <!--------->
+        <!-- END -->
+        <!--------->
+        
+	</body>
+	
+</html>

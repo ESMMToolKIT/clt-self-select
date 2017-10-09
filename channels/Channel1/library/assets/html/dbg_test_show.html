@@ -1,0 +1,459 @@
+<!doctype html>
+<html lang="en">
+	
+	<head>
+		
+		<title>The National Lottery</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta content="width=800; height:480; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
+		<!--link rel="stylesheet" type="text/css" href="css/dbg-lotto-show.css"-->
+		<style type="text/css">
+			body {background-color: #FF8000;}
+		</style>
+		<script type="text/javascript" src="libs/jquery.min.js"></script>
+        <!--script type="text/javascript" src="libs/jquery.mobile-1.3.2.min.js"></script>
+		<script type="text/javascript" src="libs/jquery-ui.js"></script-->
+        
+		<script>
+			//var ua = navigator.userAgent.toLowerCase();
+			//var isLive = ua.indexOf("android") > -1; //&& ua.indexOf("mobile");
+			var isLive = true;
+			
+			/////////////////
+			/*/ VARIABLES /*/
+			/////////////////
+			
+			var signedOn = '';
+			var cltIsDBG = '';
+			//
+			var day       = '';
+			var dayNumber = '';
+			var year      = '';
+			var hour      = '';
+			var minute    = '';
+			//
+			var jackpotShort  = '';
+			var rolloverCount = '';
+			var nextDrawDate = '';
+			//
+			var emJackpotShort  = '';
+			var emRolloverCount = '';
+			var emNextDrawDate = '';
+			
+			var formattedRollover = ['JACKPOT','ROLLOVER','DOUBLE ROLLOVER','TRIPLE ROLLOVER','QUADRUPLE ROLLOVER']
+			var timeout = 60000;
+			
+			var test1 = '';
+			var test2 = '';
+			var test3 = '';
+			var test4 = '';
+			var test5 = '';
+			
+			////////////			
+			/*/ INIT /*/
+			////////////
+			
+			function init(){
+				console.log("init();");
+				
+				//hideAllScreens();
+				$("body").show();
+				
+				$('.screen').css('position','absolute');
+				$('.overlay').css('position','absolute');
+				
+				requestSignedOnState();
+				ESMM.setShowInterruptable('true');
+			}
+			
+			
+			/////////////////			
+			/*/ FUNCTIONS /*/
+			/////////////////
+			
+			function requestSignedOnState(){
+				$('h2').append("requestSignedOnState() | ");
+				//if(isLive){
+					ESMM.requestFromObserver('signedOnStateData', '/data/signonstateobserver/signon.xml');
+				//} else {
+				//	responseFromObserver("signedOnStateData","debug");
+				//}
+			}
+			
+			function signedOnStateXMLLoaded(){
+				$('h2').append("signedOnStateXMLLoaded() | ");
+				$('h2').append(signedOn + " | ");
+				$('h2').append(cltIsDBG + " | ");
+				$('h2').append(typeof(cltIsDBG) + " | ");
+				ESMM.requestFromObserver('systemDateTimeData', '/data/systemdatetimeobserver/datetime.xml')
+				
+				/*/
+				if (signedOn != '' && cltIsDBG != '' && signedOn != null && cltIsDBG != null){
+					console.log("signedOnStateXMLLoaded :: " + signedOn +" :: "+ cltIsDBG);
+					if (cltIsDBG == 'true'){
+						if(isLive){ESMM.requestFromObserver('systemDateTimeData', '/data/systemdatetimeobserver/datetime.xml')}
+						else {responseFromObserver('systemDateTimeData','debug');}
+					} else {
+						console.log("signedOnStateXMLLoaded() This is a Scratchcard CLT");
+						changeScreen("ERROR");
+					}
+				} else {
+					console.log("signedOnStateXMLLoaded() - Data Error");
+					changeScreen("ERROR");
+				}
+				/*/
+			};
+			
+			function dateTimeXMLLoaded(){
+				$('h2').append("dateTimeXMLLoaded() | ");
+				$('h2').append(day + " | ");
+				$('h2').append(dayNumber + " | ");
+				$('h2').append(year + " | ");
+				$('h2').append(hour + " | ");
+				$('h2').append(minute + " | ");
+				requestLottoData();
+				
+				/*/
+				if(day != '' && day != null && dayNumber != '' && dayNumber != null && year != '' && year != null && hour != '' && hour != null && minute != '' && minute != null){
+					console.log("dateTimeXMLLoaded() :: " + day +" :: "+ dayNumber +" :: "+ year +" :: "+ hour +" :: "+ minute);
+					checkTime();
+				} else {
+					console.log("dateTimeXMLLoaded() - Data Error");
+					changeScreen("ERROR");
+				}
+				/*/
+			};
+			
+			function checkTime(){
+				var ts = Number(hour + minute);
+				if(ts < 1930){
+					console.log("checkTime() before draw break: "+ts);
+					requestLottoData();
+				}
+				else {
+					console.log("checkTime() after draw break: "+ts);
+					requestLottoData();
+				}
+			}
+			
+			function requestLottoData(){
+				$('h2').append("requestLottoData() | ");
+				if(isLive){ESMM.requestFromObserver('lottoData', '/data/lottodataobserver/lotto.xml')}
+				else{responseFromObserver('lottoData','debug');}
+			}
+			
+			function lottoXMLLoaded(){
+				$('h2').append("lottoXMLLoaded() | ");
+				$('h2').append("t1:" + test1 + " | ");
+				$('h2').append("t2:" + test2 + " | ");
+				$('h2').append("t3:" + test3 + " | ");
+				$('h2').append("t4:" + test4 + " | ");
+				$('h2').append("t5:" + test5 + " | ");
+				/*/
+				if (jackpotShort != '' && jackpotShort != null && rolloverCount != '' && rolloverCount != null && nextDrawDate != null){
+					console.log("lottoXMLLoaded() :: " + jackpotShort +" :: "+ rolloverCount +" :: "+ nextDrawDate);
+					populateData();
+				} else {
+					console.log("lottoXMLLoaded() - Data Error");
+					changeScreen("ERROR");
+				}
+				/*/
+				populateData();
+			};
+			
+			function populateData(){
+				console.log("populateData()");
+				
+				$('h2').append("£" + jackpotShort + "MILLION | ");
+				$('h2').append(formattedRollover[rolloverCount] + " | ");
+				$('h2').append(day + " | ");
+				$('h2').append(nextDrawDate + " | ");
+				
+				//changeScreen("DATA");
+				requestEmData();
+			}
+			
+			function requestEmData(){
+				if(isLive){ESMM.requestFromObserver('euromillionsData', '/data/euromillionsdataobserver/euro.xml')}
+				else{responseFromObserver('euromillionsData','debug');}
+			}
+			
+			function emXMLLoaded(){
+				if (emJackpotShort != '' && emJackpotShort != null && rolloverCount != '' && rolloverCount != null && nextDrawDate != null){
+					console.log("emXMLLoaded() :: " + emJackpotShort +" :: "+ rolloverCount +" :: "+ nextDrawDate);
+					populateEmData();
+				} else {
+					console.log("emXMLLoaded() - Data Error");
+					changeScreen("ERROR");
+				}
+			};
+			
+			function populateEmData(){
+				console.log("populateEmData()");
+				$('h2').append("populateEmData() | ");
+				/*/
+				$('#data-screen h1').text("£" + emJackpotShort + "MILLION");
+				$('#data-screen p.line1').text(formattedRollover[rolloverCount]);
+				$('#data-screen p.line2').text(day);
+				$('#data-screen p.line3').text(nextDrawDate);
+				/*/
+				$('h2').append("£" + emJackpotShort + "MILLION | ");
+				$('h2').append(formattedRollover[emRolloverCount] + " | ");
+				$('h2').append(emNextDrawDate + " | ");
+				
+				changeScreen("DATA");
+			}
+			
+			
+			////////////////			
+			/*/ RESPONSE /*/
+			////////////////
+			
+			
+			function responseFromObserver(id,text){
+				//console.log("responseFromObserver()");
+				
+				var parser = new DOMParser();
+				var doc = parser.parseFromString(text,'text/xml');
+				var $doc = $(doc);
+				
+				if(id == "signedOnStateData"){ 
+					if(isLive){
+						if($doc.find('details').length > 0) {
+							var xmldata = $doc.find('details');
+								
+							// NEW
+							if(xmldata.attr('signedon') != "" && xmldata.attr('signedon') != null && xmldata.attr('signedon') != undefined){signedOn = xmldata.attr('signedon');} 
+							else {signedOn = xmldata.attr('signedOn');}
+							
+							cltIsDBG = xmldata.attr('iscltdbg');
+						} else {
+							console.log("XML Load Error - SignedOnStateData");
+							changeScreen("ERROR");
+						}
+					} else {
+						signedOn = 'true'; 
+						cltIsDBG = 'true';
+					}
+					signedOnStateXMLLoaded();
+				}
+				
+				if(id == "systemDateTimeData"){ 
+					if(isLive){
+						if($doc.find('date').length > 0) {
+							var xmldata = $doc.find('date');
+							day = xmldata.attr('day');
+							dayNumber = xmldata.attr('dayNumber');
+							year = xmldata.attr('year'); 
+						} else {
+							console.log("XML Load Error - DATE");
+							changeScreen("ERROR");
+						}
+						if($doc.find('time').length > 0) {
+							var xmldata = $doc.find('time');
+							hour = xmldata.attr('hour');
+							minute = xmldata.attr('minute'); 
+						} else {
+							console.log("XML Load Error - TIME");
+							changeScreen("ERROR");
+						}
+					} else {
+						day       = 'Tuesday';
+						dayNumber = '02';
+						year      = '2015';
+						hour      = '19';
+						minute    = '31';
+					}
+					dateTimeXMLLoaded();
+				}
+				
+				if(id == "lottoData"){ 
+					if(isLive){
+
+						try {
+							if($doc.find('nextdraw').length > 0) {
+								var xmldata = $doc.find('nextdraw');
+								try {
+									jackpotShort = xmldata.attr('jackpotshort');
+									rolloverCount = xmldata.attr('rollovercount');
+									nextDrawDate = xmldata.attr('drawdate');
+									console.log("jackpotShort: "+jackpotShort);
+									console.log("rolloverCount: "+rolloverCount);
+									console.log("nextDrawDate: "+nextDrawDate);
+								} catch(err) {
+									console.log("XML Load Error - TEST");
+									changeScreen("ERROR");
+								}
+								
+								var xmldata2 = $doc.find('prizetier6');
+								try {
+									test1 = xmldata2.attr('numwinners');
+									//test3 = xmldata.attr('numwinners');
+									//test4 = xmldata.attr('numwinners');
+									//test5 = xmldata.attr('numwinners');
+								} catch(err) {
+								}
+								
+								
+								
+							} else {
+								console.log("XML Load Error - TEST");
+								changeScreen("ERROR");
+							}
+						}
+						catch(err) {
+							console.log("XML Parsing Exception ...");
+						}
+						
+					} else {
+						jackpotShort  = '12'; //  
+						rolloverCount = '2';
+						nextDrawDate = 'Mon 21 Jun 15';
+					}
+					lottoXMLLoaded();
+				}
+				
+				
+				
+				
+				if(id == "euromillionsData"){ 
+					$('h2').append("euromillionsData | ");
+					if(isLive){
+
+						try {
+							if($doc.find('nextdraw').length > 0) {
+								var xmldata = $doc.find('nextdraw');
+								try {
+									emJackpotShort = xmldata.attr('jackpotshort');
+									emRolloverCount = xmldata.attr('rollovercount');
+									emNextDrawDate = xmldata.attr('drawdate');
+								} catch(err) {
+									console.log("XML Load Error - TEST");
+									changeScreen("ERROR");
+								}
+							} else {
+								console.log("XML Load Error - TEST");
+								changeScreen("ERROR");
+							}
+						}
+						catch(err) {
+							console.log("XML Parsing Exception ...");
+						}
+						
+					} else {
+						jackpotShort  = '12'; //  
+						rolloverCount = '2';
+						nextDrawDate = 'Mon 21 Jun 15';
+					}
+					emXMLLoaded();
+				}
+			};
+			
+			///////////////
+			/*/ TIMEOUT /*/	
+			///////////////
+			
+			function startTimeout() {
+				//console.log("startTimeout();" + this.timeout);
+				//clearTimeout(this.timer);
+				//var _this = this;
+				//this.timer = setTimeout(function(){_this.exitApp();}, this.timeout);
+			};
+			
+			function stopTimeout() {
+				console.log("stopTimeout()");
+				clearTimeout(this.timer);
+			};
+			
+			function exitApp() {
+				ESMM.setShowInterruptable('true');
+				ESMM.showFinished();
+			};
+			
+			//////////////
+			/*/ SCREEN /*/
+			//////////////
+			
+			function changeScreen(scrn){
+				
+				switch(scrn){
+					
+					case "DATA":
+						$("#data-screen").fadeIn('slow');
+						break
+						
+					case "ERROR":
+						$("#error-screen").fadeIn('slow');
+						break
+				}
+			}
+			
+			
+			function loadingComplete(){
+				console.log("loadingComplete()");
+				timeout = 60000;
+				loadingStarted = false;
+				startTimeout();
+				//
+				//ESMM.setShowInterruptable('true');
+			}
+						
+			
+			function hideAllScreens(){
+				console.log("hideAllScreens()");
+				$("#data-screen").hide();
+				$("#error-screen").hide();
+			}
+			
+			////////////////////////
+			/*/ PHYSICAL BUTTONS /*/
+			////////////////////////
+			
+			function onF1Pressed(){
+				console.log("F1 Pressed");
+				//changeScreen("#00ff00");
+				$('h2').append("F1 | ");
+			}
+					
+			function onF2Pressed(){
+				console.log("F2 Pressed");
+				//changeScreen("#ffff00");
+				$('h2').append("F2 | ");
+			}
+					
+			function onF3Pressed(){
+				console.log("F3 Pressed");
+				//changeScreen("#0000ff");
+				$('h2').append("F3 | ");
+			}
+					
+			function onF4Pressed(){
+				ESMM.shutdownPlayer();
+			}
+			
+			///////////
+			/*/ END /*/
+			///////////
+				
+		</script>
+		
+	</head>
+	
+	<body onLoad="init()">
+        
+    	<!------------->
+        <!-- DEFAULT -->
+        <!------------->
+    	
+    	<div id="data-screen" class="screen">
+            <h1>TEST SHOW</h1>
+            <h2></h2>
+        </div>
+        
+        <!---------------->
+        <!--- SCREENS ---->
+        <!---------------->
+        
+	</body>
+	
+</html>

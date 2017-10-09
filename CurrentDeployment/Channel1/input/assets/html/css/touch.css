@@ -1,0 +1,88 @@
+/* CSS Document */
+
+/*/ HOME /*/
+
+h1{
+	font-size:85px;
+	line-height:75px;
+	padding:15px 20px;
+	letter-spacing:-2px;
+	word-spacing:10px;
+}
+
+h2{
+	font-size:65px;
+	line-height:60px;
+	padding:25px 20px 20px 20px;
+	letter-spacing:-2px;
+	word-spacing:10px;
+}
+
+p{
+	font-size:20px;
+	/*/line-height:75px;/*/
+	padding:0 20px;
+	/*/letter-spacing:-2px;
+	word-spacing:10px;/*/
+}
+
+
+
+#sc-home-screen, #dbg-home-screen{
+	background-image:url(../images/touch/touch-home-bg.png);
+}
+
+#sc-home-screen h1,#dbg-home-screen h1{
+
+}
+
+#sc-home-screen .content, #dbg-home-screen .content{
+	width:800px;
+	height:290px;
+	display:block;
+	float:left;
+	background-image:url(../images/generic/logo-tnl.png);
+	background-repeat:no-repeat;
+	background-position:right 90px;
+}
+
+#sc-screen1{background-image:url(../images/touch/touch-scan-barcode-scratchcard.png);}
+#dbg-screen1{background-image:url(../images/touch/touch-scan-barcode-dbg.png);}
+
+/*/ HOME BUTTONS /*/
+
+#touch-dbg-home-button-row{
+	width:800px;
+	height:105px;
+	display:block;
+	float:left;
+	margin-left:auto;
+	margin-right:auto;
+}
+.touch-dbg-home-ticket-btn{
+	width:260px;
+	height:105px;
+	display:block;
+	float:left;
+	background-image:url(../images/touch/touch-home-dbg-btn.png);
+	margin-left:135px;
+}
+#sc-home-screen .touch-dbg-home-scratchcard-btn{
+	margin-left:288px;
+}
+.touch-dbg-home-ticket-btn.buttonActive{
+	background-image:url(../images/touch/touch-home-dbg-btn-over.png);
+}
+.touch-dbg-home-scratchcard-btn{
+	width:260px;
+	height:105px;
+	display:block;
+	float:left;
+	background-image:url(../images/touch/touch-home-scratchcard-btn.png);
+}
+.touch-dbg-home-scratchcard-btn.buttonActive{
+	background-image:url(../images/touch/touch-home-scratchcard-btn-over.png);
+}
+
+#preload-01 { background: url(../images/touch/touch-home-scratchcard-btn-over.png) no-repeat -9999px -9999px; }
+#preload-02 { background: url(../images/touch/touch-home-dbg-btn-over.png) no-repeat -9999px -9999px; }

@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+    
+    
+    <head>
+        <title>The National Lottery</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <script type="text/javascript" src="libs/ost_core/jquery.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="css/ost_core/masterost.css">
+    </head>
+    
+    
+    <body onLoad="callData();">
+    	
+        
+         <div id="OSTFrame">
+            <iframe scrolling="no" src="" frameBorder="0" id="mainOSTFrame"></iframe>
+        </div>
+		
+		
+        <script type="text/javascript">
+			
+			var isLive = true;
+		
+			/////////////////
+			/*/ CALL DATA /*/
+			/////////////////
+	
+			function callData(){
+				if(isLive){
+					ESMM.requestFromObserver("ost", "/data/ostdataobserver/ost.xml");
+				} else {
+					responseFromObserver('ost','debug');	
+				}
+			}
+			
+			/////////////////
+			/*/ RESPONSES /*/
+			/////////////////
+			
+			function responseFromObserver(id, text) 
+			{
+				var parser = new DOMParser();
+				var doc = parser.parseFromString(text,'text/xml');
+				//var doc = parser.parseFromString('<?xml version="1.0" encoding="utf-8"?><scard><game id="593" gamename="MM" flag="" /></scard>','text/xml');
+				
+				if(isLive){
+					if($(doc).find('game').length > 0) {
+						var xmldata = $(doc).find('game');
+						
+						if(xmldata.attr('id') != null && xmldata.attr('id') != ""){
+							id		 = xmldata.attr('id');
+							//gamename = xmldata.attr('gamename');
+							//flag     = xmldata.attr('flag');
+							console.log("id = " + id);
+							$("#mainOSTFrame").attr("src", id + ".html");
+						} else {
+							console.log("Failed.1");
+							//changeScreen("ERROR");
+						}
+					} else {
+						console.log("Failed.2");
+						//changeScreen("ERROR");
+					}
+				} else {
+					id		 = '590';
+					//gamename = 'gamename';
+					//flag     = 'flag';
+					console.log("_id = " + id);
+					console.log("id = " + id + ".html");
+					$("#mainOSTFrame").attr("src", id + ".html");
+				}
+			}
+			
+		</script>
+        
+    </body>
+
+</html>

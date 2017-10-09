@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<playlist contentfolder="http://10.253.228.22:8090/testtool">
+<show file="channeldefault.sdf" name="channeldefault" repeat="true" uninterruptable="false"/><show file="dbg_test_show.sdf" name="dbg_test_show" repeat="true" uninterruptable="false"/><show file="dbg_lotto_show.sdf" name="dbg_lotto_show" repeat="true" uninterruptable="false"/><show file="dbg_em_show.sdf" name="dbg_em_show" repeat="true" uninterruptable="false"/><show file="dbg_self_select_show.sdf" name="dbg_self_select_show" repeat="true" uninterruptable="false"/><show file="touch_show.sdf" name="touch_show" repeat="false" uninterruptable="false"/><show file="scan_show.sdf" name="scan_show" repeat="false" uninterruptable="false"/></playlist>

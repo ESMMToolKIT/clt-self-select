@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en">
+	
+	<head>
+		
+		<title>The National Lottery</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta content="width=800; height:480; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
+		<!--link rel="stylesheet" type="text/css" href="css/dbg-lotto-show.css"-->
+		<style type="text/css">
+			body {background-color: #9FA845}
+		</style>
+		<script type="text/javascript" src="libs/jquery.min.js"></script>
+        <!--script type="text/javascript" src="libs/jquery.mobile-1.3.2.min.js"></script>
+		<script type="text/javascript" src="libs/jquery-ui.js"></script-->
+        
+		<script>
+			var ua = navigator.userAgent.toLowerCase();
+			var isLive = ua.indexOf("android") > -1; //&& ua.indexOf("mobile");
+			//var isLive = true;
+			
+			/////////////////
+			/*/ VARIABLES /*/
+			/////////////////
+			
+			var signedOn = '';
+			var cltIsDBG = '';
+			//
+			var day       = '';
+			var dayNumber = '';
+			var year      = '';
+			var hour      = '';
+			var minute    = '';
+			//
+			var jackpotShort  = '';
+			var rolloverCount = '';
+			var nextDrawDate = '';
+			//
+			var emJackpotShort  = '';
+			var emRolloverCount = '';
+			var emNextDrawDate = '';
+			
+			var formattedRollover = ['JACKPOT','ROLLOVER','DOUBLE ROLLOVER','TRIPLE ROLLOVER','QUADRUPLE ROLLOVER']
+			var timeout = 60000;
+			
+			
+			var testBarcodeErrorCode = '0'; // 0=READ || -1 -2 ERROR 
+			var testInquiryErrorCode = '1'; // 1=WINNER 2=TOP 3=LOSE
+			var testInquiryPrizeValue = '50000'; // 50000, 5000000
+			
+			var testBarcodeType = 'ITF'; // ITF || QR
+			var testBarcodeValue = '0101010';
+			var testBarcodeGameName = 'Game Name'; // Scratchcard, Lotto, Euromillions, Thunderball, Lotto HotPicks.
+			
+			var testCltIsDBG = 'true';
+			
+			////////////			
+			/*/ INIT /*/
+			////////////
+			
+			function init(){
+				console.log("init();");
+				
+				//hideAllScreens();
+				$("body").show();
+				
+				$('.screen').css('position','absolute');
+				$('.overlay').css('position','absolute');
+				
+				requestSignedOnState();
+				ESMM.setShowInterruptable('true');
+			}
+			
+			
+			/////////////////			
+			/*/ FUNCTIONS /*/
+			/////////////////
+			
+			function requestSignedOnState(){
+				$('h2').append("requestSignedOnState() | ");
+				if(isLive){ESMM.requestFromObserver('signedOnStateData', '/data/signonstateobserver/signon.xml');}
+				else{responseFromObserver('signedOnStateData','debug');}
+			}
+			
+			function signedOnStateXMLLoaded(){
+				$('h2').append("signedOnStateXMLLoaded() | ");
+				$('h2').append(signedOn + " | ");
+				$('h2').append(cltIsDBG + " | ");
+				$('h2').append(typeof(cltIsDBG) + " | ");
+				if(isLive){ESMM.requestFromObserver("barcodeData", "/data/barcodeobserver/barcode.xml");}
+				else{responseFromObserver('barcodeData','debug');}
+			};
+			
+			function barcodeXMLLoaded(){
+				$('h2').append("barcodeXMLLoaded() | ");
+				$('h2').append(barcodeType + " | ");
+				$('h2').append(barcodeValue + " | ");
+				$('h2').append(barcodeGameName + " | ");
+				$('h2').append(barcodeErrorCode + " | ");
+				$('h2').append(barcodeMessage1 + " | ");
+				$('h2').append(barcodeMessage2 + " | ");
+				if(isLive){ESMM.requestFromObserver("inquiryResponse", "/data/inquirydetailsobserver/response.xml");}
+				else{responseFromObserver('inquiryResponse','debug');}
+			};
+			
+			function inquiryXMLLoaded(){
+				$('h2').append("inquiryXMLLoaded() | ");
+				$('h2').append(inquiryResCode + " | ");
+				$('h2').append(inquiryErrCode + " | ");
+				$('h2').append(inquiryPrizeValue + " | ");
+				$('h2').append(inquiryGamePrice + " | ");
+				$('h2').append(inquiryGameCloseDate + " | ");
+				$('h2').append(inquiryLastClaimDate + " | ");
+				$('h2').append(inquiryMessage1 + " | ");
+				$('h2').append(inquiryMessage2 + " | ");
+			};
+			
+			
+			////////////////			
+			/*/ RESPONSE /*/
+			////////////////
+			
+			
+			function responseFromObserver(id,text){
+				//console.log("responseFromObserver()");
+				
+				var parser = new DOMParser();
+				var doc = parser.parseFromString(text,'text/xml');
+				var $doc = $(doc);
+				
+				if(id == "signedOnStateData"){ 
+					if(isLive){
+						if($doc.find('details').length > 0) {
+							var xmldata = $doc.find('details');
+								
+							// NEW
+							if(xmldata.attr('signedon') != "" && xmldata.attr('signedon') != null && xmldata.attr('signedon') != undefined){signedOn = xmldata.attr('signedon');} 
+							else {signedOn = xmldata.attr('signedOn');}
+							
+							cltIsDBG = xmldata.attr('iscltdbg');
+						} else {
+							console.log("XML Load Error - SignedOnStateData");
+							changeScreen("ERROR");
+						}
+					} else {
+						signedOn = 'true'; 
+						cltIsDBG = 'true';
+					}
+					signedOnStateXMLLoaded();
+				}
+				
+				////////////////////
+				/*/ BARCODE DATA /*/
+				////////////////////
+			  
+				else if(id == "barcodeData"){ 
+					console.log("responseFromObserver(); barcode data recieved");
+					
+					if(isLive){
+						if($doc.find('data').length > 0) {
+							var xmldata = $doc.find('data');
+							try{
+								barcodeType		= xmldata.attr('type');
+								barcodeValue	= xmldata.attr('value');
+								barcodeGameName	= xmldata.attr('gameName');
+								barcodeErrorCode= xmldata.attr('errcode');
+								barcodeMessage1	= xmldata.attr('message1'); 
+								barcodeMessage2	= xmldata.attr('message2');
+							} catch(err) {
+								console.log("Failed.");
+								changeScreen("ERROR");
+							}
+						} else {
+							console.log("Failed.");
+							changeScreen("ERROR");
+						}
+					} else {
+						barcodeType		= testBarcodeType; // ITF || QR (Scratchcard, DBG, EPlay)
+						barcodeValue	= testBarcodeValue; // '1000001010101000';
+						barcodeGameName = testBarcodeGameName; // 'SAMPLE GAME' || Lotto || EuroMillions || Thunderball || Lotto HotPicks;
+						barcodeErrorCode= testBarcodeErrorCode;
+						barcodeMessage1 = 'Message 1'; 
+						barcodeMessage2 = 'Message 2';
+					}
+					barcodeXMLLoaded();			  
+				} 
+				
+				/////////////////
+				/*/ VIRN DATA /*/
+				/////////////////
+				
+				else if (id == "inquiryResponse") {
+					console.log("responseFromObserver(); inquiry data recieved");
+					if(isLive){
+						if($doc.find('response').length > 0) {
+							var xmldata = $doc.find('response');
+							try{
+								inquiryGameName	     = xmldata.attr('gamename');
+								inquiryResCode       = Number(xmldata.attr('rescode'));
+								inquiryErrCode	     = Number(xmldata.attr('errcode'));
+								inquiryPrizeValue	 = Number(xmldata.attr('prizevalue'));
+								inquiryGamePrice     = xmldata.attr('gameprice');
+								inquiryGameCloseDate = xmldata.attr('gameclosedate');
+								inquiryLastClaimDate = xmldata.attr('lastclaimdate');
+								inquiryMessage1	     = xmldata.attr('message1');
+								inquiryMessage2	     = xmldata.attr('message2');
+							} catch(err){
+								console.log("Failed.");
+								changeScreen("ERROR");
+							}
+
+						} else {
+							console.log("Failed.");
+							changeScreen("ERROR");
+						}
+					} else {
+						inquiryGameName	     = testBarcodeGameName;
+						inquiryResCode       = Number(0);
+						inquiryErrCode	     = Number(testInquiryErrorCode);
+						inquiryPrizeValue    = Number(testInquiryPrizeValue);
+						inquiryGamePrice     = '200';
+						inquiryGameCloseDate = '0000';
+						inquiryLastClaimDate = '0000';
+						inquiryMessage1	     = "Message 1";
+						inquiryMessage2	     = "Message 2";
+					}
+					inquiryXMLLoaded();
+				}
+			  
+			};
+			
+			///////////////
+			/*/ TIMEOUT /*/	
+			///////////////
+			
+			function startTimeout() {
+				//console.log("startTimeout();" + this.timeout);
+				//clearTimeout(this.timer);
+				//var _this = this;
+				//this.timer = setTimeout(function(){_this.exitApp();}, this.timeout);
+			};
+			
+			function stopTimeout() {
+				console.log("stopTimeout()");
+				clearTimeout(this.timer);
+			};
+			
+			function exitApp() {
+				ESMM.setShowInterruptable('true');
+				ESMM.showFinished();
+			};
+			
+			//////////////
+			/*/ SCREEN /*/
+			//////////////
+			
+			function changeScreen(scrn){
+				
+				switch(scrn){
+					
+					case "DATA":
+						$("#data-screen").fadeIn('slow');
+						break
+						
+					case "ERROR":
+						$("#error-screen").fadeIn('slow');
+						break
+				}
+			}
+			
+			
+			function loadingComplete(){
+				console.log("loadingComplete()");
+				timeout = 60000;
+				loadingStarted = false;
+				startTimeout();
+				//
+				//ESMM.setShowInterruptable('true');
+			}
+						
+			
+			function hideAllScreens(){
+				console.log("hideAllScreens()");
+				$("#data-screen").hide();
+				$("#error-screen").hide();
+			}
+			
+			////////////////////////
+			/*/ PHYSICAL BUTTONS /*/
+			////////////////////////
+			
+			function onF1Pressed(){
+				console.log("F1 Pressed");
+				//changeScreen("#00ff00");
+				$('h2').append("F1 | ");
+			}
+					
+			function onF2Pressed(){
+				console.log("F2 Pressed");
+				//changeScreen("#ffff00");
+				$('h2').append("F2 | ");
+			}
+					
+			function onF3Pressed(){
+				console.log("F3 Pressed");
+				//changeScreen("#0000ff");
+				$('h2').append("F3 | ");
+			}
+					
+			function onF4Pressed(){
+				ESMM.shutdownPlayer();
+			}
+			
+			///////////
+			/*/ END /*/
+			///////////
+				
+		</script>
+		
+	</head>
+	
+	<body onLoad="init()">
+        
+    	<!------------->
+        <!-- DEFAULT -->
+        <!------------->
+    	
+    	<div id="data-screen" class="screen">
+            <h1>BARCODE TEST SHOW</h1>
+            <h2></h2>
+        </div>
+        
+        <!---------------->
+        <!--- SCREENS ---->
+        <!---------------->
+        
+	</body>
+	
+</html>

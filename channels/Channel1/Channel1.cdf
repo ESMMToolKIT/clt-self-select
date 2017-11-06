@@ -1,5 +1,5 @@
 <?xml version='1.0' ?>
-<Channel platform="CamelotPSP_CLT_1-4-0.jar" terminal="GT604_L26_1300" fcldate="8/30/2017" romID="ROM1" cdfW="800" cdfH="480" grouping="false">
+<Channel platform="CamelotPSP_CLT_1-5-1.jar" terminal="GT604_L26_1300" fcldate="8/30/2017" romID="ROM1" cdfW="800" cdfH="480" grouping="false">
    <Definitions>
       <observerdef name="BarcodeObserver" handler="com.gtech.esmultimedia.cdf.extension.BarcodeObserver" />
       <observerdef name="CommStatusDataObserver" handler="com.gtech.esmultimedia.cdf.extension.CommStatusDataObserver" />

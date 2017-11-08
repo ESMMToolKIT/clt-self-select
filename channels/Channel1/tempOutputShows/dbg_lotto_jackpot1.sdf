@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window x="210" y="-4" width="800" height="480" fullscreen="false" popup="false" touchshow="touch" >
+   <content dur="12" id="dbg_lotto_rollover_show.html" urn="assets/html/dbg_lotto_rollover_show.html" thumbnail="assets/thumbnails/htmlNail.png" forceaspectratio="false" />
+</window>
